@@ -4,9 +4,6 @@ import { geoPath, geoMercator } from 'https://esm.sh/d3-geo';
 import { json } from 'https://esm.sh/d3-fetch';
 
 let projection = geoMercator()
-	.scale(400)
-	.translate([200, 280])
-	.center([0, 5]);
 
 let geoGenerator = geoPath()
 	.projection(projection);
