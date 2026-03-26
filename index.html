@@ -1,138 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>D3 Ward Map</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.3.0/d3.min.js"></script>
-  <style>
-    body {
-        font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-        font-size: 14pt;
-    }
+<!-- This example is from d3indepth.com -->
 
-    h1 {
-        text-align: center;
-        font-weight: 500;
-    }
 
-    svg {
-        display: block;
-        margin: auto;
-    }
+	<div class="title"></div>
+	<svg width="760" height="140">
+		<g transform="translate(70, 70)">
+			<circle r="40" />
+			<circle r="40" cx="120" />
+			<circle r="40" cx="240" />
+			<circle r="40" cx="360" />
+			<circle r="40" cx="480" />
+		</g>
+	</svg>
 
-    div.tooltip {
-        position: absolute;
-        visibility: hidden;
-        font-size: 12px;
-        color: #333;
-        background-color: #e6e6e6;
-        opacity: 0.95;
-        padding: 6px;
-        border-radius: 4px;
-        pointer-events: none;
-    }
-  </style>
-</head>
-
-<body>
-
-<h1>Injunction Orders by Constituency</h1>
-<div id="map"></div>
-<div class="tooltip"></div>
-
-<script>
-
-var width = 1000,
-    height = 600;
-
-var svg = d3.select('#map')
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height);
-
-// Load GeoJSON
-d3.json("data/ward.geojson", function(error, geojson) {
-
-    if (error) throw error;
-
-    var features = geojson.features;
-
-    //----------------------------------------
-    // Projection (auto fits UK map)
-    var projection = d3.geoMercator()
-        .fitSize([width, height], geojson);
-
-    var path = d3.geoPath().projection(projection);
-
-    //----------------------------------------
-    // Extract data values
-    var values = features.map(function(d) {
-        return +d.properties["Number of Injunction Orders"];
-    }).filter(function(d) { return !isNaN(d); });
-
-    //----------------------------------------
-    // Color scale
-    var color_scale = d3.scaleQuantile()
-        .domain(values)
-        .range([
-            '#f7fbff','#deebf7','#c6dbef','#9ecae1',
-            '#6baed6','#4292c6','#2171b5','#084594'
-        ]);
-
-    //----------------------------------------
-    // Draw map
-    svg.selectAll('path')
-        .data(features)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .style('fill', function(d) {
-            var value = +d.properties["Number of Injunction Orders"];
-            return value ? color_scale(value) : "#ccc";
-        })
-        .style('stroke', '#999')
-        .style('stroke-width', 0.5)
-        .style('opacity', 0.8)
-
-        //----------------------------------------
-        // Tooltip interaction
-        .on('mouseover', function(d) {
-
-            d3.select(this)
-                .style('opacity', 1)
-                .style('stroke', '#333')
-                .style('stroke-width', 1);
-
-            var name = d.properties["Constituency Name"];
-            var orders = d.properties["Number of Injunction Orders"];
-
-            d3.select('.tooltip')
-                .style('visibility', 'visible')
-                .html(
-                    '<strong>' + name + '</strong><br/>' +
-                    'Injunction Orders: ' + orders
-                );
-        })
-
-        .on('mousemove', function() {
-            d3.select('.tooltip')
-                .style('top', (d3.event.pageY + 10) + 'px')
-                .style('left', (d3.event.pageX + 10) + 'px');
-        })
-
-        .on('mouseout', function() {
-
-            d3.select(this)
-                .style('opacity', 0.8)
-                .style('stroke', '#999')
-                .style('stroke-width', 0.5);
-
-            d3.select('.tooltip')
-                .style('visibility', 'hidden');
-        });
-
-});
-
-</script>
-
-</body>
-</html>
+	<form>
+		<input class="robot-checkbox" type="checkbox"> A checkbox</input>
+	</form>
