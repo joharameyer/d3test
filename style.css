@@ -13,21 +13,18 @@ body {
   margin-bottom: 5px;
 }
 
-/* Map paths */
 #content .map path {
-  fill: #aaa;
-  stroke: #fff;
+  fill: steelblue;
+  stroke: white;
   stroke-width: 0.5;
 }
 
-/* Bounding box for hover */
 #content .bounding-box rect {
   fill: none;
   stroke: #333;
   stroke-dasharray: 2,1;
 }
 
-/* Centroid circle */
 #content .centroid {
   display: none;
 }
