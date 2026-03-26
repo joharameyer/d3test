@@ -1,14 +1,123 @@
-<!-- This example is from d3indepth.com -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>D3 Wards Map</title>
+<style>
+  body {
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 14px;
+    color: #333;
+  }
 
+  #content {
+    margin: 20px;
+  }
 
-  <div id="content">
-    <div class="info">Hover over a country</div>
-    <svg width="620px" height="600px">
-      <g class="map"></g>
-      <g class="bounding-box"><rect></rect></g>
-      <g class="centroid"><circle r="4"></circle></g>
-    </svg>
-  </div>
+  #content .info {
+    height: 20px;
+    margin-bottom: 5px;
+  }
 
+  /* Map paths */
+  #content .map path {
+    fill: #aaa;
+    stroke: #fff;
+    stroke-width: 0.5;
+  }
 
-  
+  /* Bounding box for hover */
+  #content .bounding-box rect {
+    fill: none;
+    stroke: #333;
+    stroke-dasharray: 2,1;
+  }
+
+  /* Centroid circle */
+  #content .centroid {
+    display: none;
+  }
+
+  #content .centroid circle {
+    fill: red;
+    r: 4;
+  }
+</style>
+</head>
+<body>
+
+<div id="content">
+  <div class="info">Hover over a constituency</div>
+  <svg id="content-svg" width="800" height="1000">
+    <g class="map"></g>
+    <g class="bounding-box"><rect></rect></g>
+    <g class="centroid"><circle r="4"></circle></g>
+  </svg>
+</div>
+
+<!-- D3 imports -->
+<script type="module">
+import { select } from 'https://esm.sh/d3-selection';
+import { geoPath, geoMercator } from 'https://esm.sh/d3-geo';
+import { json } from 'https://esm.sh/d3-fetch';
+
+let svg = select('#content-svg');
+let projection = geoMercator();
+let geoGenerator = geoPath().projection(projection);
+
+// Mouseover handler
+function handleMouseover(e, d) {
+  let pixelArea = geoGenerator.area(d);
+  let bounds = geoGenerator.bounds(d);
+  let centroid = geoGenerator.centroid(d);
+  let measure = geoGenerator.measure(d);
+
+  // Show info
+  select('#content .info')
+    .text(d.properties["Constituency Name"] + 
+          ' (area = ' + pixelArea.toFixed(1) + 
+          ', measure = ' + measure.toFixed(1) + ')');
+
+  // Show bounding box
+  select('#content .bounding-box rect')
+    .attr('x', bounds[0][0])
+    .attr('y', bounds[0][1])
+    .attr('width', bounds[1][0] - bounds[0][0])
+    .attr('height', bounds[1][1] - bounds[0][1]);
+
+  // Show centroid
+  select('#content .centroid')
+    .style('display', 'inline')
+    .attr('transform', 'translate(' + centroid + ')');
+}
+
+// Update map
+function update(geojson) {
+  // Fit projection to SVG size
+  projection.fitSize([parseInt(svg.attr('width')), parseInt(svg.attr('height'))], geojson);
+  geoGenerator = geoPath().projection(projection);
+
+  const u = svg.select('g.map')
+    .selectAll('path')
+    .data(geojson.features);
+
+  u.enter()
+    .append('path')
+    .attr('d', geoGenerator)
+    .attr('fill', 'steelblue')   // visible fill
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 0.5)
+    .on('mouseover', handleMouseover);
+}
+
+// Load GeoJSON
+json('https://raw.githubusercontent.com/joharameyer/d3test/main/wards.geojson')
+  .then(data => {
+    console.log('Loaded features:', data.features.length);
+    update(data);
+  })
+  .catch(err => console.error(err));
+</script>
+
+</body>
+</html>
