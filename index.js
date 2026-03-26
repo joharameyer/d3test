@@ -33,10 +33,14 @@ function update(geojson) {
 		.selectAll('path')
 		.data(geojson.features);
 
-	u.enter()
-		.append('path')
-		.attr('d', geoGenerator)
-		.on('mouseover', handleMouseover);
+u.enter()
+  .append('path')
+  .attr('d', geoGenerator)       // only once!
+  .attr('fill', 'red')           // make it visible
+  .attr('stroke', 'black')
+  .attr('stroke-width', 0.5)
+  .on('mouseover', handleMouseover);
+	
 }
 
 
