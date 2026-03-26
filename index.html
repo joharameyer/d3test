@@ -1,79 +1,29 @@
-console.log("script running");
 <script>
+
+console.log("script running");
 
 const svg = d3.select("svg");
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-// projection
 const projection = d3.geoMercator();
 const path = d3.geoPath().projection(projection);
 
-// color scale
-const color = d3.scaleThreshold()
-    .domain([0.1,1,5,25,50,100,500,1000])
-    .range(d3.schemeRdPu[9]);
-
 Promise.all([
-  d3.json("ward.geojson"),
-  d3.json("hs2.geojson"),
-  d3.json("tree.geojson")
-]).then(([ward, hs2, tree]) => {
+  d3.json("ward.geojson")
+]).then(([ward]) => {
+
+  console.log("data loaded", ward);
 
   projection.fitSize([width, height], ward);
 
-  // tooltip
-  const tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("background", "white")
-    .style("padding", "8px")
-    .style("display", "none");
-
-  // wards
   svg.append("g")
     .selectAll("path")
     .data(ward.features)
     .join("path")
-    .attr("class", "ward")
     .attr("d", path)
-    .attr("fill", d => {
-      const val = d.properties["Total Area Injuncted (ha)"];
-      return val ? color(val) : "#f7f7f7";
-    })
-    .on("mouseover", (event, d) => {
-      tooltip.style("display", "block")
-        .html(`
-          <strong>${d.properties["Ward Name"]}</strong><br>
-          Area: ${d.properties["Total Area Injuncted (ha)"]}
-        `);
-    })
-    .on("mousemove", event => {
-      tooltip
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY + 10) + "px");
-    })
-    .on("mouseout", () => {
-      tooltip.style("display", "none");
-    });
-
-  // HS2
-  svg.append("g")
-    .selectAll("path")
-    .data(hs2.features)
-    .join("path")
-    .attr("d", path)
-    .attr("fill", "#BF40BF")
-    .attr("opacity", 0.8);
-
-  // Tree
-  svg.append("g")
-    .selectAll("path")
-    .data(tree.features)
-    .join("path")
-    .attr("d", path)
-    .attr("fill", "#BF40BF")
-    .attr("opacity", 0.8);
+    .attr("fill", "red")
+    .attr("stroke", "white");
 
 });
 
