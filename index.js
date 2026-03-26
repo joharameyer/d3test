@@ -42,7 +42,7 @@ function update(geojson) {
 
 
 // REQUEST DATA
-json('https://raw.githubusercontent.com/joharameyer/d3test/main/wards.geojson')
+json('https://github.com/joharameyer/d3test/blob/487580a752f694b987040b539955d5959e01ed9f/ward.geojson')
   .then(function(data) {
     projection.fitSize([400, 600], data);
     update(data);
