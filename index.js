@@ -45,9 +45,9 @@ function update(geojson) {
 
 
 // REQUEST DATA
-json('https://assets.codepen.io/2814973/africa.json')
-	.then(function(json) {
-		update(json)
-	});
-
+json('https://raw.githubusercontent.com/joharameyer/d3test/main/wards.geojson')
+  .then(function(data) {
+    projection.fitSize([400, 600], data);
+    update(data);
+  });
 
