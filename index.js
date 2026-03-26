@@ -53,7 +53,7 @@ function update(geojson) {
 }
 
 // Load GeoJSON
-json('https://raw.githubusercontent.com/joharameyer/d3test/main/wards.geojson')
+json('https://github.com/joharameyer/d3test/blob/f8e76eb884f7dc677ccccaa6f3b9419cfacadea6/ward.geojson')
   .then(data => {
     console.log('Loaded features:', data.features.length);
     update(data);
