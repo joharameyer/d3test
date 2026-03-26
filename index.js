@@ -1,55 +1,46 @@
-import { select } from 'https://esm.sh/d3-selection';
-import { geoPath, geoMercator } from 'https://esm.sh/d3-geo';
-import { json } from 'https://esm.sh/d3-fetch';
+<script>
 
-const svg = select('#content-svg');
-const width = parseInt(svg.attr('width'));
-const height = parseInt(svg.attr('height'));
+// The svg
+const svg = d3.select("svg"),
+  width = +svg.attr("width"),
+  height = +svg.attr("height");
 
-let projection = geoMercator();
-let geoGenerator = geoPath().projection(projection);
+// Map and projection
+const path = d3.geoPath();
+const projection = d3.geoMercator()
+  .scale(70)
+  .center([0,20])
+  .translate([width / 2, height / 2]);
 
-// Mouseover
-function handleMouseover(e, d) {
-  const bounds = geoGenerator.bounds(d);
-  const centroid = geoGenerator.centroid(d);
+// Data and color scale
+let data = new Map()
+const colorScale = d3.scaleThreshold()
+  .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
+  .range(d3.schemeBlues[7]);
 
-  select('#content .info')
-    .text(d.properties["Constituency Name"]);
+// Load external data and boot
+Promise.all([
+d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
+d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world_population.csv", function(d) {
+    data.set(d.code, +d.pop)
+})
+]).then(function(loadData){
+    let topo = loadData[0]
 
-  select('#content .bounding-box rect')
-    .attr('x', bounds[0][0])
-    .attr('y', bounds[0][1])
-    .attr('width', bounds[1][0] - bounds[0][0])
-    .attr('height', bounds[1][1] - bounds[0][1]);
+    // Draw the map
+  svg.append("g")
+    .selectAll("path")
+    .data(topo.features)
+    .join("path")
+      // draw each country
+      .attr("d", d3.geoPath()
+        .projection(projection)
+      )
+      // set the color of each country
+      .attr("fill", function (d) {
+        d.total = data.get(d.id) || 0;
+        return colorScale(d.total);
+      })
+})
 
-  select('#content .centroid')
-    .style('display', 'inline')
-    .attr('transform', 'translate(' + centroid + ')');
-}
-
-// Update map
-function update(geojson) {
-  // Fit projection to SVG
-  projection.fitSize([width, height], geojson);
-  geoGenerator = geoPath().projection(projection);
-
-  svg.select('g.map')
-    .selectAll('path')
-    .data(geojson.features)
-    .enter()
-    .append('path')
-    .attr('d', geoGenerator)
-    .attr('fill', 'steelblue')
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 0.5)
-    .on('mouseover', handleMouseover);
-}
-
-// Load GeoJSON
-json('https://raw.githubusercontent.com/joharameyer/d3test/f8e76eb884f7dc677ccccaa6f3b9419cfacadea6/ward.geojson')
-  .then(data => {
-    console.log('Loaded features:', data.features.length);
-    update(data);
-  })
-  .catch(err => console.error('Error loading GeoJSON:', err));
+</script>
