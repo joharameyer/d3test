@@ -9,23 +9,25 @@ let geoGenerator = geoPath()
 	.projection(projection);
 
 function handleMouseover(e, d) {
-	let pixelArea = geoGenerator.area(d);
-	let bounds = geoGenerator.bounds(d);
-	let centroid = geoGenerator.centroid(d);
-	let measure = geoGenerator.measure(d);
+    let pixelArea = geoGenerator.area(d);
+    let bounds = geoGenerator.bounds(d);
+    let centroid = geoGenerator.centroid(d);
+    let measure = geoGenerator.measure(d);
 
-	select('#content .info')
-		.text(d.properties.name + ' (path.area = ' + pixelArea.toFixed(1) + ' path.measure = ' + measure.toFixed(1) + ')');
+    select('#content .info')
+        .text(d.properties["Constituency Name"] + 
+              ' (area = ' + pixelArea.toFixed(1) + 
+              ', measure = ' + measure.toFixed(1) + ')');
 
-	select('#content .bounding-box rect')
-		.attr('x', bounds[0][0])
-		.attr('y', bounds[0][1])
-		.attr('width', bounds[1][0] - bounds[0][0])
-		.attr('height', bounds[1][1] - bounds[0][1]);
+    select('#content .bounding-box rect')
+        .attr('x', bounds[0][0])
+        .attr('y', bounds[0][1])
+        .attr('width', bounds[1][0] - bounds[0][0])
+        .attr('height', bounds[1][1] - bounds[0][1]);
 
-	select('#content .centroid')
-		.style('display', 'inline')
-		.attr('transform', 'translate(' + centroid + ')');
+    select('#content .centroid')
+        .style('display', 'inline')
+        .attr('transform', 'translate(' + centroid + ')');
 }
 
 function update(geojson) {
